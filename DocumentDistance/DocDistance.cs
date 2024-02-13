@@ -28,6 +28,7 @@ namespace DocumentDistance
 
             string s = "[A-Za-z0-9]*";
             Regex re = new Regex(s);
+
             Console.Write("\nD1:\n");
             Console.Write(d1);
             Console.Write("\nD2:\n");
