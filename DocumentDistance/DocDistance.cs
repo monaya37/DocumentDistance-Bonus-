@@ -44,31 +44,53 @@ namespace DocumentDistance
             {
                
                 if (!d1_words.ContainsKey(m.Value.ToLower()))
+                {
                     d1_words.Add(m.Value.ToLower(), 1);
+                }
                 else
                     d1_words[m.Value.ToLower()]++;
+
+                d2_words.Add(m.Value.ToLower(), 0);
+
             }
             
 
             foreach (Match m in m2)
             {
-                if (!d2_words.ContainsKey(m.Value.ToLower()))
-                    d2_words.Add(m.Value.ToLower(), 1);
-                else
+                //if it is in array2 then it must be in array 1
+                if (d2_words.ContainsKey(m.Value.ToLower()))
                     d2_words[m.Value.ToLower()]++;
+                else
+                {
+                    d2_words.Add(m.Value.ToLower(), 1);
+                    d1_words.Add(m.Value.ToLower(), 0);
+                }
             }
 
-            var sum1 = d1_words.Sum(x => x.Value^2);
-            var sum2 = d1_words.Sum(x => x.Value^2);
-            var d1Xd2 = Math.Sqrt(sum1 * sum2);
+            float sum1 = d1_words.Sum(x => x.Value^2);
+            float sum2 = d1_words.Sum(x => x.Value^2);
+            float d1Xd2 = (float)Math.Sqrt(sum1 * sum2);
+            float d1Dotd2 = 0;
 
-            foreach (KeyValuePair<string, int> m in d1_words)
+
+
+            foreach (var m in d1_words)
             {
-                Console.WriteLine("{0} {1}", m.Key, m.Value);
+                d1Dotd2 = d1Dotd2 + (d2_words[m.Key] * d1_words[m.Key]);
+                Console.WriteLine(d1Dotd2);
+                //Console.WriteLine("{0} {1}", m.Key, m.Value);
             }
-            Console.WriteLine("END OF THE LIST\n");
+            var ans = Math.Acos(d1Xd2 / d1Dotd2);
+            double a = (double)d1Xd2 / d1Dotd2;
 
-           // Console.Write("\nD1:\n");
+
+            Console.WriteLine("END OF THE LIST");
+            Console.WriteLine("Answer");
+            Console.WriteLine(d1Dotd2);
+
+
+
+            // Console.Write("\nD1:\n");
             //Console.Write(d1);
             //Console.Write("\nD2:\n");
             //Console.Write(d2);
