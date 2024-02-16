@@ -38,25 +38,27 @@ namespace DocumentDistance
             Regex re = new Regex(s);
             var m1 = Regex.Matches(d1, s);
             var m2 = Regex.Matches(d2, s);
-
-            Console.WriteLine("THE LIST");
-            foreach(Match m in m1)
+           
+            // Console.WriteLine("THE LIST");
+            foreach (Match m in m1)
             {
-               
+                //Console.WriteLine(m.Value.ToLower());
+
                 if (!d1_words.ContainsKey(m.Value.ToLower()))
                 {
                     d1_words.Add(m.Value.ToLower(), 1);
+                    d2_words.Add(m.Value.ToLower(), 0);
                 }
                 else
                     d1_words[m.Value.ToLower()]++;
-
-                d2_words.Add(m.Value.ToLower(), 0);
 
             }
             
 
             foreach (Match m in m2)
             {
+
+
                 //if it is in array2 then it must be in array 1
                 if (d2_words.ContainsKey(m.Value.ToLower()))
                     d2_words[m.Value.ToLower()]++;
@@ -65,11 +67,12 @@ namespace DocumentDistance
                     d2_words.Add(m.Value.ToLower(), 1);
                     d1_words.Add(m.Value.ToLower(), 0);
                 }
+
             }
 
-            float sum1 = d1_words.Sum(x => x.Value^2);
-            float sum2 = d1_words.Sum(x => x.Value^2);
-            float d1Xd2 = (float)Math.Sqrt(sum1 * sum2);
+            var sum1 = d1_words.Sum(x => Math.Pow(x.Value, 2));
+            var sum2 = d2_words.Sum(x => Math.Pow(x.Value, 2));
+            var d1Xd2 = Math.Sqrt(sum1 * sum2);
             float d1Dotd2 = 0;
 
 
@@ -77,26 +80,17 @@ namespace DocumentDistance
             foreach (var m in d1_words)
             {
                 d1Dotd2 = d1Dotd2 + (d2_words[m.Key] * d1_words[m.Key]);
-                Console.WriteLine(d1Dotd2);
+                //Console.WriteLine(d1Dotd2);
                 //Console.WriteLine("{0} {1}", m.Key, m.Value);
             }
-            var ans = Math.Acos(d1Xd2 / d1Dotd2);
-            double a = (double)d1Xd2 / d1Dotd2;
+           //Console.WriteLine("Sum1 w sum2");
 
-
-            Console.WriteLine("END OF THE LIST");
-            Console.WriteLine("Answer");
-            Console.WriteLine(d1Dotd2);
+           //Console.WriteLine(sum1);
+            //Console.WriteLine(sum2);
 
 
 
-            // Console.Write("\nD1:\n");
-            //Console.Write(d1);
-            //Console.Write("\nD2:\n");
-            //Console.Write(d2);
-            // char[] seperators = { ' ', '\t', '\n', ',' };
-
-            return 0;
+            return Math.Acos(d1Dotd2 / d1Xd2) * 180 / Math.PI; ;
         }
     }
 }
