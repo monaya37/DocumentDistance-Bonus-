@@ -30,19 +30,22 @@ namespace DocumentDistance
 
 
         //Semaphores
-        static SemaphoreSlim dectionariesSemaphore = new SemaphoreSlim(1);
 
         //Dictionaries
         public static Dictionary <string, double> d1_words = new Dictionary<string, double>();
         public static Dictionary <string, double> d2_words = new Dictionary<string, double>();
+        public static Dictionary<string, double> d1;
+        public static Dictionary<string, double> d2;
 
         public static string doc1;
         public static string doc2;
         public static double CalculateDistance(string doc1FilePath, string doc2FilePath)
         {
             //Threads
-             Thread thread1 = new Thread(new ThreadStart(doc1Function));
-             Thread thread2 = new Thread(new ThreadStart(doc2Function));
+            Thread thread1 = new Thread(new ThreadStart(doc1Function));
+            Thread thread2 = new Thread(new ThreadStart(doc2Function));
+            Thread thread3 = new Thread(new ThreadStart(join1));
+            Thread thread4 = new Thread(new ThreadStart(join2));
 
             //READ FILES
             doc1 = File.ReadAllText(doc1FilePath);
@@ -62,6 +65,16 @@ namespace DocumentDistance
             double sum2 = d2_words.Sum(x => Math.Pow(x.Value, 2));
             double d1Xd2 = Math.Sqrt(sum1 * sum2);
 
+            d1 = new Dictionary<string, double>(d2_words);
+            d2 = new Dictionary<string, double>(d1_words);
+
+            thread3.Start();
+            thread4.Start();
+
+            while (thread3.IsAlive || thread4.IsAlive) ;
+
+
+
 
 
             double d1Dotd2 = 0;
@@ -71,11 +84,7 @@ namespace DocumentDistance
                 //Console.WriteLine("{0} --> {1}", m.Key, m.Value);
             }
 
-            //foreach (var m in d2_words)
-            //{
-            //    //d1Dotd2 += (d2_words[m.Key] * d1_words[m.Key]);
-            //    Console.WriteLine("{0} --> {1}", m.Key, m.Value);
-            //}
+            
 
             //Console.WriteLine();
             //Console.WriteLine(d1_words.Count);
@@ -87,7 +96,8 @@ namespace DocumentDistance
 
             return answer;
         }
-        
+
+
         public static void doc1Function()
         {
 
@@ -103,21 +113,16 @@ namespace DocumentDistance
 
                 else
                 {
-                    dectionariesSemaphore.Wait();
+                    //dectionariesSemaphore.Wait();
                     {
                         if (!d1_words.ContainsKey(word.ToLower()))
                         {
                             d1_words.Add(word.ToLower(), 1);
-                            if (!d2_words.ContainsKey(word.ToLower()))
-                            {
-                                d2_words.Add(word.ToLower(), 0);
-                            }
-                            
                         }
                         else
                             d1_words[word.ToLower()]++;
                     }
-                    dectionariesSemaphore.Release();
+                    //dectionariesSemaphore.Release();
                     word = "";
                 }
             }
@@ -127,7 +132,6 @@ namespace DocumentDistance
 
         private static void doc2Function()
         {
-            //f2Semaphore.Wait();
             string word = "";
             doc2 += '#';
             foreach (char letter in doc2)
@@ -138,7 +142,6 @@ namespace DocumentDistance
                 }
                 else
                 {
-                    dectionariesSemaphore.Wait();
                     {
                         //if it is in array2 then it must be in array 1
                         if (d2_words.ContainsKey(word.ToLower()))
@@ -146,15 +149,37 @@ namespace DocumentDistance
                         else
                         {
                             d2_words.Add(word.ToLower(), 1);
-                            if (!d1_words.ContainsKey(word.ToLower()))
-                                d1_words.Add(word.ToLower(), 0);
                         }
                     }
-                    dectionariesSemaphore.Release();
                     word = "";
                 }
             }
-           f2Semaphore.Release();
         }
+
+
+        private static void join1()
+        {
+            foreach (var m in d1)
+            {
+                if (!d1_words.ContainsKey(m.Key))
+                {
+                    d1_words.Add(m.Key, 0);
+                }
+            }
+        }
+
+        private static void join2()
+        {
+
+            foreach (var m in d2)
+            {
+                if (!d2_words.ContainsKey(m.Key))
+                {
+                    d2_words.Add(m.Key, 0);
+                }
+
+            }
+        }
+
     }
 }
