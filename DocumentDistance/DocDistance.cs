@@ -25,70 +25,84 @@ namespace DocumentDistance
         {
  
             //READ FILES
-            string d1 = File.ReadAllText(doc1FilePath);
-            string d2 = File.ReadAllText(doc2FilePath);
+            string doc1 = File.ReadAllText(doc1FilePath);
+            string doc2 = File.ReadAllText(doc2FilePath);
+
 
             //Dictionaries
-            Dictionary <string, int> d1_words = new Dictionary<string, int>();
-            Dictionary <string, int> d2_words = new Dictionary<string, int>();
+            Dictionary <string, double> d1_words = new Dictionary<string, double>();
+            Dictionary <string, double> d2_words = new Dictionary<string, double>();
+            string word = "";
 
-            //(The privilage of being a CS Student)
-            //REGULAR EXPRESSIONS AND MATCHES
-            string s = "[A-Za-z0-9]+";
-            Regex re = new Regex(s);
-            var m1 = Regex.Matches(d1, s);
-            var m2 = Regex.Matches(d2, s);
-           
-            // Console.WriteLine("THE LIST");
-            foreach (Match m in m1)
+            doc1 += '#';
+            foreach (char letter in doc1)
             {
-                //Console.WriteLine(m.Value.ToLower());
+                if (Char.IsLetterOrDigit(letter))
+                    word += letter;
 
-                if (!d1_words.ContainsKey(m.Value.ToLower()))
-                {
-                    d1_words.Add(m.Value.ToLower(), 1);
-                    d2_words.Add(m.Value.ToLower(), 0);
-                }
-                else
-                    d1_words[m.Value.ToLower()]++;
-
-            }
-            
-
-            foreach (Match m in m2)
-            {
-
-
-                //if it is in array2 then it must be in array 1
-                if (d2_words.ContainsKey(m.Value.ToLower()))
-                    d2_words[m.Value.ToLower()]++;
                 else
                 {
-                    d2_words.Add(m.Value.ToLower(), 1);
-                    d1_words.Add(m.Value.ToLower(), 0);
-                }
+                    if (!d1_words.ContainsKey(word.ToLower()))
+                    {
+                        d1_words.Add(word.ToLower(), 1);
+                        d2_words.Add(word.ToLower(), 0);
+                    }
+                    else
+                        d1_words[word.ToLower()]++;
 
+                    word = "";
+                }
+            }
+          
+
+
+            doc2 += '#';
+            foreach (char letter in doc2)
+            {
+                if (Char.IsLetterOrDigit(letter))
+                {
+                    word += letter;
+                }
+                else
+                {
+                    //if it is in array2 then it must be in array 1
+                    if (d2_words.ContainsKey(word.ToLower()))
+                        d2_words[word.ToLower()]++;
+                    else
+                    {
+                        d2_words.Add(word.ToLower(), 1);
+                        d1_words.Add(word.ToLower(), 0);
+                    }
+
+                    //Console.WriteLine(word);
+                    word = "";
+                }
             }
 
-            var sum1 = d1_words.Sum(x => Math.Pow(x.Value, 2));
-            var sum2 = d2_words.Sum(x => Math.Pow(x.Value, 2));
-            var d1Xd2 = Math.Sqrt(sum1 * sum2);
-            float d1Dotd2 = 0;
 
+            if(d1_words.ContainsKey(String.Empty))  d1_words.Remove(String.Empty);
+            if(d2_words.ContainsKey(String.Empty))  d2_words.Remove(String.Empty);
 
+            double sum1 = d1_words.Sum(x => Math.Pow(x.Value, 2));
+            double sum2 = d2_words.Sum(x => Math.Pow(x.Value, 2));
+            double d1Xd2 = Math.Sqrt(sum1 * sum2);
 
+            //foreach (var m in d1_words)
+            //{
+            //    Console.WriteLine("{0} --> {1}", m.Key, m.Value);
+            //}
+
+            double d1Dotd2 = 0;
             foreach (var m in d1_words)
             {
-                d1Dotd2 = d1Dotd2 + (d2_words[m.Key] * d1_words[m.Key]);
+                d1Dotd2 += (d2_words[m.Key] * d1_words[m.Key]);
                 //Console.WriteLine(d1Dotd2);
                 //Console.WriteLine("{0} {1}", m.Key, m.Value);
             }
-           //Console.WriteLine("Sum1 w sum2");
+            //Console.WriteLine();
 
-           //Console.WriteLine(sum1);
-            //Console.WriteLine(sum2);
-
-
+            //Console.WriteLine(d1Xd2);
+            //Console.WriteLine(d1Dotd2);
 
             return Math.Acos(d1Dotd2 / d1Xd2) * 180 / Math.PI; ;
         }
