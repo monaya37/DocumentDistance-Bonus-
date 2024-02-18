@@ -87,10 +87,7 @@ namespace DocumentDistance
             double sum2 = d2_words.Sum(x => Math.Pow(x.Value, 2));
             double d1Xd2 = Math.Sqrt(sum1 * sum2);
 
-            //foreach (var m in d1_words)
-            //{
-            //    Console.WriteLine("{0} --> {1}", m.Key, m.Value);
-            //}
+ 
 
             double d1Dotd2 = 0;
             foreach (var m in d1_words)
@@ -99,11 +96,7 @@ namespace DocumentDistance
                 //Console.WriteLine(d1Dotd2);
                 //Console.WriteLine("{0} {1}", m.Key, m.Value);
             }
-            //Console.WriteLine();
-
-            //Console.WriteLine(d1Xd2);
-            //Console.WriteLine(d1Dotd2);
-
+     
             return Math.Acos(d1Dotd2 / d1Xd2) * 180 / Math.PI; ;
         }
     }
